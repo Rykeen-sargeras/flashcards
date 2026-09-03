@@ -21,6 +21,7 @@
     }
 
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
 
     html, body { min-height: 100%; }
 
@@ -520,7 +521,7 @@
 
     <div class="progress-row" aria-label="Flashcard progress">
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <span class="counter" id="counter">1 of 81</span>
+      <span class="counter" id="counter">1 of 130</span>
     </div>
 
     <div class="section-tabs" role="tablist" aria-label="Menu sections">
@@ -833,6 +834,116 @@
       cardItem("Cajun Popcorn Po' Boy Combo", "Po' Boy Combos", 14.99, "Half a crispy fried crawfish tails po' boy with a cup of seafood or chicken and sausage gumbo.", "Seasoned fries or potato salad")
     );
 
+    const basketSide = "Fries, hushpuppies & tartar sauce";
+    const basketAddons = [{ label: "Sub Baked Potato", price: 1.99 }, { label: "Add Side Salad", price: 3.99 }];
+    const grilledPlateSide = "Mexican rice & mango-pineapple pico";
+    const grilledPlateAddons = [{ label: "Make it Blackened", price: 1.00 }, { label: "Add Side Salad", price: 3.99 }];
+    const specialtyAddons = [{ label: "Add Lump Crab", price: 12.99 }, { label: "Add Sautéed Baby Shrimp", price: 7.99 }, { label: "Add 3 Shrimp Brochette", price: 12.99 }];
+
+    Object.assign(findItem("Jumbo Fried Shrimp Basket"), {
+      name: "Jumbo Fried Shrimp",
+      section: "Seafood Baskets",
+      basePrice: 15.99,
+      desc: "Jumbo 16/20 fried shrimp served with fries, hushpuppies, and tartar sauce. Cocktail sauce available.",
+      side: basketSide,
+      addons: basketAddons,
+      priceOptions: priceChoices(["6 Pieces", 15.99], ["12 Pieces", 21.99], ["18 Pieces", 26.99])
+    });
+    Object.assign(findItem("Shrimp & Veggies Plate"), {
+      name: "Shrimp & Veggies",
+      section: "Grilled Plates",
+      basePrice: 18.99,
+      desc: "Seasoned grilled jumbo shrimp with sautéed zucchini, yellow squash, red and green bell pepper, and red onion.",
+      side: grilledPlateSide,
+      addons: grilledPlateAddons
+    });
+    Object.assign(findItem("Blackened Redfish Pontchartrain"), {
+      section: "Specialties",
+      basePrice: 25.99,
+      desc: "Classic Cajun mushroom sauce over blackened redfish with two grilled jumbo shrimp, served on Mexican rice with sautéed vegetables.",
+      side: "Side salad & baked potato",
+      addons: specialtyAddons
+    });
+    Object.assign(findItem("Specialty Seafood Enchiladas"), {
+      name: "Seafood Enchiladas",
+      section: "Specialties",
+      basePrice: 23.99,
+      desc: "Two enchiladas stuffed with mozzarella, baby shrimp, and crab, covered with spicy pepper jack cream sauce and topped with blackened scallops and jumbo shrimp.",
+      side: "Side salad, Mexican rice, charro beans & pico",
+      addons: specialtyAddons
+    });
+    Object.assign(findItem("Shrimp Brochette"), {
+      section: "Specialties",
+      basePrice: 22.99,
+      desc: "Six jumbo bacon-wrapped shrimp stuffed with grilled jalapeño and mozzarella, served with jalapeño cheese grits and sautéed vegetables.",
+      side: "Side salad & mango-pineapple pico",
+      addons: specialtyAddons
+    });
+    Object.assign(findItem("Family Gumbo Pak To-Go"), {
+      name: "Gumbo Family Pack",
+      section: "Family & Party Packs"
+    });
+
+    menuItems.push(
+      cardItem("Fish Basket", "Seafood Baskets", 12.99, "Crispy golden fried fish served with fries, hushpuppies, and tartar sauce. Cocktail sauce available.", basketSide, basketAddons, priceChoices(["Small · 3 Pieces", 12.99], ["Medium · 5 Pieces", 14.99], ["Large · 7 Pieces", 16.99])),
+      cardItem("Fried Oysters", "Seafood Baskets", 16.99, "Cornmeal-fried oysters served with fries, hushpuppies, and tartar sauce.", basketSide, basketAddons),
+      cardItem("4 Jumbo Fried Shrimp & 3 Piece Fish", "Seafood Baskets", 16.99, "Four jumbo fried shrimp and three pieces of fried fish.", basketSide, basketAddons),
+      cardItem("4 Jumbo Fried Shrimp & 5 Piece Fish", "Seafood Baskets", 18.99, "Four jumbo fried shrimp and five pieces of fried fish.", basketSide, basketAddons),
+      cardItem("6 Jumbo Fried Shrimp & 3 Piece Fish", "Seafood Baskets", 19.99, "Six jumbo fried shrimp and three pieces of fried fish.", basketSide, basketAddons),
+      cardItem("6 Jumbo Fried Shrimp & 5 Piece Fish", "Seafood Baskets", 21.99, "Six jumbo fried shrimp and five pieces of fried fish.", basketSide, basketAddons),
+      cardItem("Oyster & Shrimp Combo", "Seafood Baskets", 20.99, "Four fried oysters and six jumbo fried shrimp.", basketSide, basketAddons),
+      cardItem("Oyster, Fish & Shrimp Combo", "Seafood Baskets", 23.99, "Four fried oysters, six jumbo fried shrimp, and three pieces of fried fish.", basketSide, basketAddons),
+      cardItem("Seafood Platter", "Seafood Baskets", 28.99, "Four jumbo fried shrimp, four oysters, five pieces of fried fish, and a crab cake.", basketSide, basketAddons),
+
+      cardItem("Boiled Jumbo Shrimp", "Boiled Seafood", 12.99, "Jumbo shrimp boiled to order and served steaming hot with cocktail sauce.", "Cocktail sauce included", [], priceChoices(["Half Pound", 12.99], ["One Pound", 19.99])),
+      Object.assign(cardItem("Boiled Crawfish (Seasonal / Market Price)", "Boiled Seafood", 0, "Mouthwatering boiled spicy crawfish served with one corn and two potatoes.", "1 corn & 2 potatoes included"), { priceLabel: "Market Price" }),
+      cardItem("Seafood Boil", "Boiled Seafood", 49.99, "Two snow crab clusters, one pound of boiled shrimp, a Zummo's sausage link, two potatoes, and two corn doused in garlic butter sauce.", "Grilled bread included"),
+
+      cardItem("Fish & Veggies", "Grilled Plates", 17.99, "Seasoned grilled tilapia with sautéed zucchini, yellow squash, red and green bell pepper, and red onion.", grilledPlateSide, grilledPlateAddons),
+      cardItem("Fish, Shrimp & Veggies", "Grilled Plates", 19.99, "Seasoned grilled tilapia and jumbo shrimp with sautéed zucchini, yellow squash, red and green bell pepper, and red onion.", grilledPlateSide, grilledPlateAddons),
+      cardItem("Grilled Chicken & Veggies", "Grilled Plates", 16.99, "Char-grilled chicken breast with sautéed zucchini, yellow squash, red and green bell pepper, and red onion.", grilledPlateSide, grilledPlateAddons),
+
+      cardItem("Shrimp & Grits", "Specialties", 22.99, "Jumbo shrimp sautéed with garlic, green onion, and diced Roma tomato over creamy pepper jack cheese grits. Ask for no bread for a gluten-free option.", "Side salad & sautéed vegetables", specialtyAddons),
+      cardItem("New Orleans Bar-B-Que Shrimp", "Specialties", 21.99, "Jumbo shrimp New Orleans-style with Worcestershire, fresh tomato, garlic, green onion, and fresh lemon over seasoned rice. Ask for no bread for a gluten-free option.", "Side salad included", specialtyAddons),
+      cardItem("Grilled Salmon", "Specialties", 22.99, "Grilled salmon topped with garlic, caper, green onion, and fresh lime cream sauce.", "Side salad, sautéed vegetables & Mexican rice", specialtyAddons),
+      cardItem("Blackened Ahi Tuna", "Specialties", 21.99, "Ahi tuna blackened to medium rare and served with sautéed vegetables and Mexican rice.", "Side salad, wasabi & mango-pineapple pico", specialtyAddons),
+      cardItem("Blackened Tilapia", "Specialties", 19.99, "Blackened tilapia topped with creamy pepper jack shrimp sauce.", "Side salad, Mexican rice, sautéed vegetables & mango-pineapple pico", specialtyAddons),
+      cardItem("Ribeye Steak", "Specialties", 34.99, "A 14-ounce USDA Choice Black Angus ribeye, char-grilled to your liking.", "Side salad & baked potato", specialtyAddons),
+
+      cardItem("Coca-Cola Products", "Beverages", 3.59, "Coca-Cola, Diet Coke, Coke Zero, Dr Pepper, Diet Dr Pepper, Sprite, Fanta Orange, Minute Maid Zero Sugar Lemonade."),
+      cardItem("Community Brand Tea and Coffee", "Beverages", 3.59, "Sweet tea, unsweet tea, or Community coffee.", "Refills available", [{ label: "Add Tea Flavor", price: 0.50 }]),
+      cardItem("Bottled Sodas", "Beverages", 3.59, "Big Red, Orange Crush, Grape Crush, Root Beer, Mexican Cola, Topo Chico, or carbonated mineral water."),
+      cardItem("Red Bull Energy Drinks", "Beverages", 4.99, "Original, Sugar Free, or Peach. Flavors may vary by location."),
+
+      cardItem("Strawberry Shortcake", "Desserts", 7.49, "Pound cake layered with whipped cream and strawberries."),
+      cardItem("Tia's Bread Pudding", "Desserts", 7.49, "Traditional homemade bread pudding topped with warm bourbon sauce and pecans."),
+      cardItem("Sopapilla Cheesecake", "Desserts", 7.49, "Cinnamon and vanilla cream cheese cake topped with strawberries."),
+      cardItem("Chocolate Thunder", "Desserts", 8.99, "A three-layer dark chocolate cake with dark chocolate icing, semi-sweet chocolate pieces, and whipped cream with a cherry."),
+
+      cardItem("Mexican Butter", "Extras", 1.29, "A side of Tia's seasoned Mexican butter."),
+      cardItem("Side of Jalapeño Ranch", "Extras", 1.99, "A side serving of house-made jalapeño ranch."),
+      cardItem("Side Salsa", "Extras", 1.49, "Tia's house salsa.", "Choose a size", [], priceChoices(["Side · 4 oz", 1.49], ["Pint · 16 oz", 6.99])),
+      cardItem("Fried Whole Jalapeño", "Extras", 1.29, "A whole jalapeño fried until blistered."),
+      cardItem("Side Pico de Gallo", "Extras", 1.99, "A side of fresh pico de gallo."),
+      cardItem("Charro Beans", "Extras", 2.99, "Tia's savory charro beans.", "Choose a size", [], priceChoices(["Cup", 2.99], ["Small Bowl", 4.49])),
+      cardItem("Side of Guacamole", "Extras", 2.99, "A side of freshly mashed guacamole."),
+      cardItem("Side of Sliced Avocado", "Extras", 2.99, "A side of fresh sliced avocado."),
+      cardItem("Side of Mango Pico de Gallo", "Extras", 2.99, "A side of fresh mango-pineapple pico de gallo."),
+      cardItem("Side of Fries", "Extras", 2.99, "A side of seasoned French fries."),
+      cardItem("Baked Potato", "Extras", 3.99, "A baked potato with butter, sour cream, bacon, cheddar cheese, and green onions."),
+
+      cardItem("Chicken Nuggets", "Kid's Menu", 7.99, "Chicken nuggets for kids 10 and under.", "Fries & kid's drink included"),
+      cardItem("Popcorn Shrimp", "Kid's Menu", 7.99, "Popcorn shrimp for kids 10 and under. For gluten-free, substitute grilled shrimp and rice or potato salad with no hushpuppy.", "Fries, hushpuppy & kid's drink included"),
+      cardItem("Fish Strips", "Kid's Menu", 7.99, "Fish strips for kids 10 and under. For gluten-free, substitute grilled fish and rice or potato salad with no hushpuppy.", "Fries, hushpuppy & kid's drink included"),
+      cardItem("Meat & Cheese Taco", "Kid's Menu", 7.99, "A crispy taco shell with taco meat and cheddar jack cheese, served with a side of queso. Ground meat contains MSG.", "Fries & kid's drink included"),
+      cardItem("French Fry Nachos", "Kid's Menu", 7.99, "French fries topped with taco meat, melted cheese, and queso.", "Kid's drink included"),
+
+      cardItem("Family Taco Pack", "Family & Party Packs", 59.99, "Serves up to four. Choose twelve flour or corn tortillas with ground beef, or fish, shrimp, or roast beef, plus the matching toppings.", "1 quart rice, 1 quart charro beans & 1 pint jalapeño ranch"),
+      cardItem("Family Fajita Pack (1.5 lb)", "Family & Party Packs", 85.99, "Serves up to four with your choice of fajita beef or chicken and the full family-size fajita fixings.", "Rice, charro beans, toppings, tortillas, chips & salsa"),
+      cardItem("Family Seafood Pack", "Family & Party Packs", 75.99, "Sixteen jumbo fried shrimp, eight fried fish filets, eight fried oysters, twelve hushpuppies, and fries.", "Tartar & cocktail sauce available on request"),
+      Object.assign(cardItem("Crawfish 20 Pounds (When Available)", "Family & Party Packs", 0, "Twenty pounds of mouthwatering spicy crawfish with one garlic clove, four corn, and eight potatoes.", "Seasonal availability", [{ label: "Extra Potato", price: 0.50 }, { label: "Extra Corn", price: 0.75 }, { label: "Zummo's Sausage Link", price: 3.50 }, { label: "Pink Sauce · 2 cups", price: 3.50 }, { label: "Melted Butter · 2 oz", price: 0.50 }, { label: "Crawfish Seasoning · 1 oz", price: 0.25 }]), { priceLabel: "Market Price" })
+    );
+
     const card = document.getElementById("card");
     const dishNumber = document.getElementById("dishNumber");
     const dishName = document.getElementById("dishName");
@@ -876,6 +987,10 @@
         ? item.priceOptions[selectedPriceOptions[currentIndex]].price
         : item.basePrice;
       const extras = [...selectedAddons[currentIndex]].reduce((sum, addonIndex) => sum + item.addons[addonIndex].price, 0);
+      if (item.priceLabel) {
+        totalPrice.textContent = extras ? `${item.priceLabel} + ${money.format(extras)}` : item.priceLabel;
+        return;
+      }
       totalPrice.textContent = money.format(startingPrice + extras);
     }
 
@@ -958,16 +1073,23 @@
       card.setAttribute("aria-pressed", "false");
       dishName.textContent = item.name;
       const firstPrice = item.priceOptions ? item.priceOptions[0] : null;
-      basePrice.textContent = firstPrice
+      basePrice.textContent = item.priceLabel || (firstPrice
         ? `${firstPrice.label} ${money.format(firstPrice.price)}`
-        : money.format(item.basePrice);
-      priceContext.textContent = item.priceOptions && item.priceOptions.length > 1
+        : money.format(item.basePrice));
+      priceContext.textContent = item.priceLabel
+        ? "Ask for today's price"
+        : item.priceOptions && item.priceOptions.length > 1
         ? item.priceOptions.slice(1).map((option) => `${option.label} ${money.format(option.price)}`).join(" • ")
         : "Base price";
       backTitle.textContent = item.name;
       description.textContent = item.desc;
       side.textContent = item.side;
-      addonsLabel.textContent = item.priceOptions ? "Choose your price" : "Make it yours";
+      const hasChoices = Boolean(item.priceOptions || item.addons.length);
+      addonsLabel.hidden = !hasChoices;
+      addons.hidden = !hasChoices;
+      addonsLabel.textContent = item.priceOptions && item.addons.length
+        ? "Choose your price & extras"
+        : item.priceOptions ? "Choose your price" : "Make it yours";
       const choices = item.priceOptions ? item.priceOptions.map(makePriceOption) : [];
       const extras = item.addons.map(makeAddon);
       addons.replaceChildren(...choices, ...extras);
@@ -1003,7 +1125,7 @@
 
     function renderSectionButtons() {
       const available = new Set(menuItems.map(itemSection));
-      const sectionOrder = ["Featured", "Starters", "Salads", "Gumbo", "Oysters", "Mexicajun", "Tacos", "Fajitas", "Po' Boys", "Po' Boy Combos", "Margaritas"];
+      const sectionOrder = ["Starters", "Salads", "Gumbo", "Oysters", "Mexicajun", "Tacos", "Fajitas", "Po' Boys", "Po' Boy Combos", "Seafood Baskets", "Boiled Seafood", "Grilled Plates", "Specialties", "Beverages", "Desserts", "Extras", "Kid's Menu", "Family & Party Packs", "Margaritas"];
       const sections = sectionOrder.filter((section) => available.has(section));
       sections.forEach((section) => {
         const button = document.createElement("button");
