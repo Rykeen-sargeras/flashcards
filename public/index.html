@@ -202,6 +202,7 @@
 
     .hide-prices .base-price,
     .hide-prices .price-context,
+    .hide-prices .back-price,
     .hide-prices .total-label,
     .hide-prices .total-price,
     .hide-prices .addon-price { display: none; }
@@ -373,6 +374,14 @@
       font-size: clamp(1.35rem, 4vw, 2rem);
       line-height: 1.08;
       letter-spacing: -0.025em;
+    }
+
+    .back-price {
+      display: block;
+      margin-top: 0.38rem;
+      color: var(--magenta);
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      font-weight: 900;
     }
 
     .description {
@@ -636,6 +645,7 @@
             <span>
               <span class="back-kicker">The details</span>
               <span class="back-title" id="backTitle"></span>
+              <span class="back-price" id="backPrice"></span>
             </span>
             <span class="description" id="description"></span>
             <span class="side-detail"><span class="side-icon" aria-hidden="true">✦</span><span><strong>Side:</strong> <span id="side"></span></span></span>
@@ -1041,6 +1051,7 @@
     const basePrice = document.getElementById("basePrice");
     const priceContext = document.getElementById("priceContext");
     const backTitle = document.getElementById("backTitle");
+    const backPrice = document.getElementById("backPrice");
     const description = document.getElementById("description");
     const side = document.getElementById("side");
     const addonsLabel = document.getElementById("addonsLabel");
@@ -1080,9 +1091,13 @@
         : item.basePrice;
       const extras = [...selectedAddons[currentIndex]].reduce((sum, addonIndex) => sum + item.addons[addonIndex].price, 0);
       if (item.priceLabel) {
+        backPrice.textContent = item.priceLabel;
         totalPrice.textContent = extras ? `${item.priceLabel} + ${money.format(extras)}` : item.priceLabel;
         return;
       }
+      backPrice.textContent = item.priceOptions
+        ? `${item.priceOptions[selectedPriceOptions[currentIndex]].label} · ${money.format(startingPrice)}`
+        : `Base price · ${money.format(startingPrice)}`;
       totalPrice.textContent = money.format(startingPrice + extras);
     }
 
