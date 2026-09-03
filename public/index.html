@@ -242,6 +242,7 @@
       background: transparent;
       cursor: pointer;
       perspective: inherit;
+      isolation: isolate;
       text-align: left;
       user-select: none;
     }
@@ -251,11 +252,17 @@
     .card-inner {
       position: absolute;
       inset: 0;
+      -webkit-transform: translateZ(0);
       transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
       transition: transform 560ms cubic-bezier(.2,.72,.22,1);
+      will-change: transform;
     }
 
-    .card.is-flipped .card-inner { transform: rotateY(180deg); }
+    .card.is-flipped .card-inner {
+      -webkit-transform: translateZ(0) rotateY(180deg);
+      transform: translateZ(0) rotateY(180deg);
+    }
 
     .card-face {
       position: absolute;
@@ -264,8 +271,18 @@
       border: 1px solid rgba(255, 255, 255, 0.8);
       border-radius: inherit;
       box-shadow: var(--shadow);
+      -webkit-transform: rotateY(0deg) translateZ(1px);
+      transform: rotateY(0deg) translateZ(1px);
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
+    }
+
+    /* iOS Safari can composite children separately during a 3D flip. Hide both
+       faces and their layers so the reversed back never bleeds through. */
+    .card-face,
+    .card-face * {
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
     }
 
     .card-front {
@@ -354,7 +371,8 @@
       flex-direction: column;
       gap: clamp(0.7rem, 2vh, 1rem);
       padding: clamp(1.25rem, 4vw, 2rem);
-      transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg) translateZ(1px);
+      transform: rotateY(180deg) translateZ(1px);
       background: linear-gradient(155deg, #fffafd 0%, #fce7f3 100%);
     }
 
