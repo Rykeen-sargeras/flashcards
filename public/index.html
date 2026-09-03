@@ -117,19 +117,23 @@
     }
 
     .section-tabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      display: flex;
       gap: 0.3rem;
       width: min(100%, 36rem);
       margin: 0 auto;
       padding: 0.28rem;
+      overflow-x: auto;
       border: 1px solid var(--line);
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.58);
       box-shadow: 0 4px 16px rgba(131, 24, 67, 0.06);
+      scrollbar-width: none;
     }
 
+    .section-tabs::-webkit-scrollbar { display: none; }
+
     .section-button {
+      flex: 0 0 auto;
       min-width: 0;
       border: 0;
       border-radius: 999px;
@@ -516,13 +520,11 @@
 
     <div class="progress-row" aria-label="Flashcard progress">
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <span class="counter" id="counter">1 of 13</span>
+      <span class="counter" id="counter">1 of 81</span>
     </div>
 
     <div class="section-tabs" role="tablist" aria-label="Menu sections">
       <button class="section-button" type="button" role="tab" aria-selected="true" data-section="All">All Cards</button>
-      <button class="section-button" type="button" role="tab" aria-selected="false" data-section="Food">Food</button>
-      <button class="section-button" type="button" role="tab" aria-selected="false" data-section="Margaritas">Margaritas</button>
     </div>
 
     <section class="stage" aria-live="polite">
@@ -695,6 +697,142 @@
       }
     ];
 
+    const cardItem = (name, section, basePrice, desc, side = "None", addons = [], priceOptions = null) => ({
+      name, section, basePrice, desc, side, addons, ...(priceOptions ? { priceOptions } : {})
+    });
+
+    const priceChoices = (...choices) => choices.map(([label, price]) => ({ label, price }));
+    const findItem = (name) => menuItems.find((item) => item.name === name);
+
+    menuItems.forEach((item) => { if (!item.section) item.section = "Featured"; });
+
+    Object.assign(findItem("TJ's Dip Sampler"), {
+      name: "Dip Sampler",
+      section: "Starters",
+      basePrice: 9.99,
+      desc: "Salsa, two scoops of guacamole, and jalapeño ranch.",
+      side: "Tortilla chips included"
+    });
+    Object.assign(findItem("Blackened Shrimp & Crab Bread Bowl"), {
+      section: "Starters",
+      basePrice: 16.99,
+      desc: "Blackened shrimp and lump crab in pepper jack cream sauce, topped with melted mozzarella cheese and served with flour tortilla chips.",
+      side: "Flour tortilla chips included",
+      addons: []
+    });
+    Object.assign(findItem("Grilled Chicken Salad"), {
+      section: "Salads",
+      basePrice: 13.99,
+      side: "Choice of dressing",
+      addons: []
+    });
+    Object.assign(findItem("Grilled Fish Tacos"), {
+      section: "Tacos",
+      basePrice: 14.49,
+      desc: "Grilled fish tacos on corn or flour tortillas. Gluten-free option available with corn tortillas.",
+      side: "Salsa & charro beans included",
+      addons: []
+    });
+    Object.assign(findItem("Fish Po' Boy"), {
+      section: "Po' Boys",
+      basePrice: 13.49,
+      desc: "Crispy fried fish filets on a toasted French roll with tartar sauce, lettuce, and tomato.",
+      side: "Seasoned fries or potato salad",
+      addons: []
+    });
+
+    menuItems.filter((item) => item.section === "Margaritas").forEach((item) => {
+      const upgrade = item.addons[0].price;
+      item.priceOptions = priceChoices(["House", item.basePrice], ["Top Shelf", item.basePrice + upgrade]);
+      item.addons = [];
+    });
+
+    const saladDressings = "Ranch, jalapeño ranch, avocado ranch, Italian, Caesar, Greek, blue cheese, honey mustard, Thousand Island, or balsamic vinaigrette";
+    const tacoSide = "Salsa & charro beans included";
+    const poBoySide = "Seasoned fries or potato salad";
+    const fajitaSide = "Mexican rice, charro beans & fajita fixings";
+    const fajitaDescription = "Sizzling char-grilled fajitas on grilled onions with bell pepper, served with charro beans, Mexican rice, cabbage-cilantro slaw, pico de gallo, guacamole, sour cream, mixed cheeses, Mexican butter, a fried jalapeño, and corn or flour tortillas.";
+    const addBrochette = [{ label: "Add 3 Shrimp Brochette", price: 12.99 }];
+
+    menuItems.push(
+      cardItem("Chips & Queso", "Starters", 6.99, "Creamy melted American cheeses with diced jalapeño flavor.", "Tortilla chips included", [{ label: "Add Spicy Taco Beef", price: 2.49 }], priceChoices(["Cup", 6.99], ["Bowl", 8.99])),
+      cardItem("Spicy Guacamole Appetizer", "Starters", 8.99, "Four scoops of fresh avocado with diced tomato and onion, spiked with grilled fresh jalapeño.", "Tortilla chips included"),
+      cardItem("Mexican Shrimp Cocktail", "Starters", 7.99, "Baby shrimp boiled and mixed with spicy horseradish cocktail sauce and pico de gallo, topped with diced avocado. Ask for no crackers for a gluten-free option.", "Crackers included", [], priceChoices(["Small", 7.99], ["Large", 11.99])),
+      cardItem("Crab Cakes", "Starters", 16.99, "Two grilled lump crab cakes seasoned with Cajun spices and served with remoulade sauce."),
+      cardItem("Hushpuppies", "Starters", 2.99, "Golden hushpuppies served with Mexican butter.", "Mexican butter included", [], priceChoices(["Half Dozen", 2.99], ["Dozen", 4.99])),
+      cardItem("Fried Crawfish Tails", "Starters", 13.99, "Louisiana crawfish tails deep fried in our signature breading and served with zesty sauce for dipping.", "Zesty dipping sauce included"),
+      cardItem("Pork Belly Bites", "Starters", 15.99, "Seasoned pork belly fried and finished in house-made jalapeño jelly, served with guacamole and extra jalapeño jelly.", "Guacamole & dipping jelly included"),
+      cardItem("Boudin Balls", "Starters", 2.99, "House-made smoked boudin rolled in bread crumbs and deep-fried to crunchy Cajun goodness.", "Priced individually"),
+      cardItem("Chips & Salsa", "Starters", 3.99, "Cold salsa made with grilled fresh jalapeño and onion, spiked with cilantro.", "Tortilla chips included"),
+      cardItem("Crawfish Queso", "Starters", 13.99, "A bowl of Tia's creamy queso with seasoned crawfish tails for the perfect kick, served with chips and salsa.", "Chips & salsa included"),
+      cardItem("Cucumber Snacker", "Starters", 5.99, "Sliced and striped cucumbers with a cup of jalapeño ranch for dipping.", "Jalapeño ranch included"),
+      cardItem("Pistolette", "Starters", 4.99, "A fried Cajun roll stuffed with shrimp étouffée.", "Priced individually"),
+      cardItem("Stuffed Mushrooms", "Starters", 14.99, "Mushroom caps stuffed with crabmeat dressing and topped with creamy shrimp sauce."),
+      cardItem("Fried Alligator Bites", "Starters", 15.99, "Lightly breaded, Cajun-seasoned alligator served with a zesty dipping sauce.", "Zesty dipping sauce included"),
+      cardItem("Fried Pickles", "Starters", 10.99, "Dill pickle slices breaded and deep fried, served with house-made jalapeño ranch.", "Jalapeño ranch included"),
+      cardItem("Cajun Fried Ribs", "Starters", 14.99, "One pound of seasoned baby back ribs fried to perfection."),
+
+      cardItem("Jumbo Grilled Shrimp Salad", "Salads", 14.99, "Mixed greens, tomato, carrots, cucumber, diced avocado, boiled egg, red onion, mozzarella, and grilled shrimp.", saladDressings),
+      cardItem("Taco Salad", "Salads", 12.99, "Spicy taco meat in a fried tortilla shell with mixed greens, red onion, tomato, carrots, red cabbage, cheddar jack, sour cream, and guacamole. Ask for no shell for a gluten-free option.", saladDressings),
+      cardItem("Big Salad", "Salads", 9.99, "Mixed greens, tomato, carrots, cucumber, boiled egg, red onion, diced avocado, mozzarella, pecans, and dried cranberries.", saladDressings),
+      cardItem("Greek Salad", "Salads", 14.99, "Mixed greens, cucumber, bell pepper, celery, red onion, tomato, feta, avocado, Kalamata olives, and jumbo boiled shrimp tossed in tangy Greek dressing.", "Tangy Greek dressing included"),
+      cardItem("Cajun Popcorn Salad", "Salads", 14.99, "Fried crawfish tails over mixed greens with tomato, cucumber, carrots, boiled egg, red onion, avocado, mozzarella, pecans, and dried cranberries.", saladDressings),
+
+      cardItem("Seafood Gumbo", "Gumbo", 6.99, "Dark roux with shrimp and crab.", "Rice included", [], priceChoices(["Cup", 6.99], ["Small Bowl", 9.99], ["Large Bowl", 14.49])),
+      cardItem("Chicken Sausage Gumbo", "Gumbo", 6.99, "Dark roux with chicken and Zummo's sausage.", "Rice included", [], priceChoices(["Cup", 6.99], ["Small Bowl", 9.99], ["Large Bowl", 14.49])),
+      cardItem("Side of Potato Salad", "Gumbo", 2.99, "A side serving of creamy potato salad."),
+      cardItem("Charro Beans, Zummo's and Rice", "Gumbo", 4.99, "Charro beans and Zummo's sausage topped with pico de gallo. Gluten-free option available without hushpuppies.", "Hushpuppies included", [], priceChoices(["Cup + 2 Hushpuppies", 4.99], ["Bowl + 4 Hushpuppies", 6.99])),
+      cardItem("Gallons To-Go", "Gumbo", 64.99, "A gallon for game day or a holiday party. Choose seafood gumbo or chicken and sausage gumbo.", "To-go gallon", [], priceChoices(["Seafood", 64.99], ["Chicken & Sausage", 64.99])),
+      cardItem("Family Gumbo Pak To-Go", "Gumbo", 75.99, "Two quarts of gumbo, two quarts of rice, one quart of potato salad, crackers, and a dip sampler with chips, salsa, jalapeño ranch, and guacamole.", "Family package", [{ label: "Add Cup of Queso", price: 5.00 }, { label: "Add Bowl of Queso", price: 7.00 }], priceChoices(["Chicken & Sausage", 75.99], ["Seafood", 75.99])),
+
+      cardItem("Oysters on the Half Shell", "Oysters", 11.99, "Freshly shucked oysters on the half shell. Not available for takeout.", "Skip bread and crackers for gluten-free", [], priceChoices(["Half Dozen", 11.99], ["Dozen", 18.99])),
+      cardItem("Char Grilled Oysters", "Oysters", 14.99, "Traditional garlic butter and Parmesan char-grilled oysters.", "Skip bread and crackers for gluten-free", [], priceChoices(["Half Dozen", 14.99], ["Dozen", 22.99])),
+      cardItem("Oysters Juanita", "Oysters", 15.99, "Char-grilled oysters topped with bacon and jalapeño.", "Skip bread and crackers for gluten-free", [], priceChoices(["Half Dozen", 15.99], ["Dozen", 24.99])),
+      cardItem("Oysters Royale", "Oysters", 17.99, "Char-grilled oysters topped with lump crab meat.", "Skip bread and crackers for gluten-free", [], priceChoices(["Half Dozen", 17.99], ["Dozen", 26.99])),
+
+      cardItem("Grilled Boudin Quesadillas", "Mexicajun", 14.99, "House-made boudin with mozzarella and green onion, served with guacamole, pico de gallo, and jalapeño ranch.", "Guacamole, pico & ranch included"),
+      cardItem("Grilled Shrimp Quesadillas", "Mexicajun", 15.99, "Grilled shrimp with mozzarella and green onions, served with guacamole, pico de gallo, and jalapeño ranch.", "Guacamole, pico & ranch included"),
+      cardItem("Fajita Quesadillas", "Mexicajun", 14.99, "Gooey mozzarella and green onion with your choice of fajita chicken or steak, served with guacamole, pico de gallo, and jalapeño ranch.", "Guacamole, pico & ranch included", [], priceChoices(["Chicken", 14.99], ["Steak", 16.99])),
+      cardItem("Crawfish Quesadilla", "Mexicajun", 16.99, "Seasoned crawfish tails, green onions, and mozzarella in a toasted tortilla, served with pico de gallo, jalapeño ranch, and guacamole.", "Pico, ranch & guacamole included"),
+      cardItem("Blackened Seafood Nachos", "Mexicajun", 16.99, "Blackened seafood over spicy pepper jack cream sauce and mozzarella on tortilla chips, topped with lettuce, guacamole, and pico de gallo.", "Lettuce, guacamole & pico included", [], priceChoices(["Blackened Shrimp", 16.99], ["Blackened Crawfish", 18.99], ["Blackened Shrimp & Crab", 18.99])),
+      cardItem("Steak Nachos", "Mexicajun", 17.99, "Grilled steak over melted cheddar jack and refried beans on tortilla chips, served with lettuce, guacamole, sour cream, tomatoes, and jalapeños."),
+      cardItem("Grilled Chicken Nachos", "Mexicajun", 15.99, "Grilled chicken over melted cheddar jack and refried beans on tortilla chips, served with lettuce, guacamole, sour cream, tomatoes, and jalapeños."),
+      cardItem("Nachos Supreme", "Mexicajun", 14.99, "Spicy ground beef, queso, refried beans, and cheddar jack, topped with lettuce, tomatoes, guacamole, sour cream, and jalapeños."),
+      cardItem("Spicy Beef Nachos", "Mexicajun", 13.99, "Spicy ground beef, refried beans, queso, melted cheddar jack, and jalapeños."),
+      cardItem("Bean & Cheese Nachos", "Mexicajun", 11.99, "Refried beans, queso, melted cheddar jack cheese, and jalapeños."),
+
+      cardItem("Grilled Shrimp Tacos", "Tacos", 14.99, "Grilled shrimp tacos on corn or flour tortillas. Gluten-free option available with corn tortillas.", tacoSide),
+      cardItem("Roast Beef Tacos", "Tacos", 14.49, "Roast beef tacos topped with pico de gallo.", tacoSide),
+      cardItem("Trio Tacos", "Tacos", 14.99, "One roast beef taco, one shrimp taco, and one fish taco.", tacoSide),
+      cardItem("Blackened Gator Tacos", "Tacos", 16.99, "Tender blackened alligator tail meat on corn or flour tortillas. Gluten-free option available with corn tortillas.", tacoSide),
+      cardItem("Crispy Beef Tacos", "Tacos", 13.99, "Spicy taco beef topped with lettuce, tomatoes, and cheddar jack in a crispy taco shell, served with sour cream and guacamole.", tacoSide),
+      cardItem("Redfish Tacos", "Tacos", 22.99, "Two colossal flour taco shells with melted mozzarella, cabbage slaw, and grilled redfish, served with Mexican rice, charro beans, mango-pineapple pico, and jalapeño ranch.", "Rice, beans, pico & ranch included"),
+
+      cardItem("Beef Fajitas", "Fajitas", 24.99, fajitaDescription, fajitaSide, addBrochette),
+      cardItem("Chicken Fajitas", "Fajitas", 20.99, fajitaDescription, fajitaSide, addBrochette),
+      cardItem("Jumbo Grilled Shrimp Fajitas", "Fajitas", 23.99, fajitaDescription, fajitaSide, addBrochette),
+      cardItem("Veggie Fajitas", "Fajitas", 15.99, "Fresh grilled zucchini, yellow squash, green and red bell pepper, purple onion, and mushrooms, served with the full fajita fixings.", fajitaSide, addBrochette),
+      cardItem("Ribeye Steak Fajitas", "Fajitas", 33.99, fajitaDescription, fajitaSide, addBrochette),
+      cardItem("The Big Ricky Combo Fajitas", "Fajitas", 54.99, "Fajita chicken, fajita beef, fried ribs, and shrimp brochette with Mexican butter and a fried jalapeño, served with two portions of the full fajita fixings.", "Two portions of rice, beans & fixings"),
+      cardItem("Big Combo Chicken & Shrimp Fajitas", "Fajitas", 28.99, "Fajita chicken and a grilled shrimp skewer over grilled onions and bell peppers, served with two portions of the full fajita fixings.", "Two portions of rice, beans & fixings"),
+      cardItem("Big Combo Beef Fajitas & Shrimp Brochette", "Fajitas", 31.99, "Beef fajitas and shrimp brochette over grilled onions and bell peppers, served with two portions of the full fajita fixings.", "Two portions of rice, beans & fixings"),
+
+      cardItem("Shrimp Po' Boy", "Po' Boys", 14.49, "A toasted French roll loaded with crunchy popcorn shrimp, tartar sauce, lettuce, and tomato.", poBoySide),
+      cardItem("Cajun Girl Po' Boy", "Po' Boys", 15.99, "Grilled jumbo shrimp and grilled onion topped with spicy pepper jack cream sauce and melted mozzarella on a toasted French roll.", poBoySide),
+      cardItem("Roast Beef Po' Boy", "Po' Boys", 13.99, "Slow-roasted beef cooked with fresh jalapeño and onion, topped with melted grilled mozzarella on a toasted French roll with savory brown gravy for dipping.", poBoySide),
+      cardItem("Grilled Boudin Po' Boy", "Po' Boys", 13.49, "House-made jalapeño boudin grilled and topped with gooey mozzarella on a toasted French roll with lettuce and tomato.", poBoySide),
+      cardItem("Oyster Po' Boy", "Po' Boys", 16.49, "Fried oysters on a toasted French roll with tartar sauce, lettuce, and tomato.", poBoySide),
+      cardItem("Cajun Popcorn Po' Boy", "Po' Boys", 14.99, "Fried crawfish tails on a toasted French roll with lettuce and tomato, served with zesty sauce.", poBoySide),
+
+      cardItem("Fish Po' Boy Combo", "Po' Boy Combos", 13.49, "Half a crispy fried fish po' boy with a cup of seafood or chicken and sausage gumbo.", "Seasoned fries or potato salad"),
+      cardItem("Shrimp Po' Boy Combo", "Po' Boy Combos", 14.49, "Half a crunchy popcorn shrimp po' boy with a cup of seafood or chicken and sausage gumbo.", "Seasoned fries or potato salad"),
+      cardItem("Cajun Girl Po' Boy Combo", "Po' Boy Combos", 15.99, "Half a grilled shrimp and onion po' boy with spicy pepper jack cream sauce, plus a cup of seafood or chicken and sausage gumbo.", "Seasoned fries or potato salad"),
+      cardItem("Roast Beef Po' Boy Combo", "Po' Boy Combos", 13.99, "Half a slow-roasted beef and mozzarella po' boy with brown gravy, plus a cup of seafood or chicken and sausage gumbo.", "Seasoned fries or potato salad"),
+      cardItem("Grilled Boudin Po' Boy Combo", "Po' Boy Combos", 13.49, "Half a grilled jalapeño boudin and mozzarella po' boy with a cup of seafood or chicken and sausage gumbo.", "Seasoned fries or potato salad"),
+      cardItem("Oyster Po' Boy Combo", "Po' Boy Combos", 16.49, "Half a fried oyster po' boy with a cup of seafood or chicken and sausage gumbo.", "Seasoned fries or potato salad"),
+      cardItem("Cajun Popcorn Po' Boy Combo", "Po' Boy Combos", 14.99, "Half a crispy fried crawfish tails po' boy with a cup of seafood or chicken and sausage gumbo.", "Seasoned fries or potato salad")
+    );
+
     const card = document.getElementById("card");
     const dishNumber = document.getElementById("dishNumber");
     const dishName = document.getElementById("dishName");
@@ -710,7 +848,7 @@
     const progressFill = document.getElementById("progressFill");
     const previousButton = document.getElementById("previousButton");
     const nextButton = document.getElementById("nextButton");
-    const sectionButtons = [...document.querySelectorAll(".section-button")];
+    const sectionTabs = document.querySelector(".section-tabs");
 
     let currentIndex = 0;
     let activeSection = "All";
@@ -718,6 +856,7 @@
     let touchStartY = 0;
     let movedBySwipe = false;
     const selectedAddons = menuItems.map(() => new Set());
+    const selectedPriceOptions = menuItems.map(() => 0);
     const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
     function itemSection(item) {
@@ -733,8 +872,46 @@
 
     function calculateTotal() {
       const item = menuItems[currentIndex];
+      const startingPrice = item.priceOptions
+        ? item.priceOptions[selectedPriceOptions[currentIndex]].price
+        : item.basePrice;
       const extras = [...selectedAddons[currentIndex]].reduce((sum, addonIndex) => sum + item.addons[addonIndex].price, 0);
-      totalPrice.textContent = money.format(item.basePrice + extras);
+      totalPrice.textContent = money.format(startingPrice + extras);
+    }
+
+    function makePriceOption(option, optionIndex) {
+      const label = document.createElement("label");
+      label.className = "addon";
+      label.addEventListener("click", (event) => event.stopPropagation());
+
+      const copy = document.createElement("span");
+      copy.className = "addon-copy";
+      const name = document.createElement("span");
+      name.className = "addon-name";
+      name.textContent = option.label;
+      const price = document.createElement("span");
+      price.className = "addon-price";
+      price.textContent = money.format(option.price);
+      copy.append(name, price);
+
+      const input = document.createElement("input");
+      input.className = "switch-input";
+      input.type = "radio";
+      input.name = `price-${currentIndex}`;
+      input.checked = selectedPriceOptions[currentIndex] === optionIndex;
+      input.setAttribute("aria-label", `${option.label}, ${money.format(option.price)}`);
+      input.addEventListener("click", (event) => event.stopPropagation());
+      input.addEventListener("change", (event) => {
+        event.stopPropagation();
+        selectedPriceOptions[currentIndex] = optionIndex;
+        calculateTotal();
+      });
+
+      const toggle = document.createElement("span");
+      toggle.className = "switch";
+      toggle.setAttribute("aria-hidden", "true");
+      label.append(copy, input, toggle);
+      return label;
     }
 
     function makeAddon(addon, addonIndex) {
@@ -779,21 +956,24 @@
       const item = menuItems[currentIndex];
       card.classList.remove("is-flipped");
       card.setAttribute("aria-pressed", "false");
-      dishNumber.textContent = String(currentIndex + 1).padStart(2, "0");
       dishName.textContent = item.name;
-      basePrice.textContent = item.section === "Margaritas"
-        ? `House ${money.format(item.basePrice)}`
+      const firstPrice = item.priceOptions ? item.priceOptions[0] : null;
+      basePrice.textContent = firstPrice
+        ? `${firstPrice.label} ${money.format(firstPrice.price)}`
         : money.format(item.basePrice);
-      priceContext.textContent = item.section === "Margaritas"
-        ? `Top Shelf ${money.format(item.basePrice + item.addons[0].price)}`
+      priceContext.textContent = item.priceOptions && item.priceOptions.length > 1
+        ? item.priceOptions.slice(1).map((option) => `${option.label} ${money.format(option.price)}`).join(" • ")
         : "Base price";
       backTitle.textContent = item.name;
       description.textContent = item.desc;
       side.textContent = item.side;
-      addonsLabel.textContent = item.section === "Margaritas" ? "Choose your pour" : "Make it yours";
-      addons.replaceChildren(...item.addons.map(makeAddon));
+      addonsLabel.textContent = item.priceOptions ? "Choose your price" : "Make it yours";
+      const choices = item.priceOptions ? item.priceOptions.map(makePriceOption) : [];
+      const extras = item.addons.map(makeAddon);
+      addons.replaceChildren(...choices, ...extras);
       const visible = visibleIndices();
       const position = visible.indexOf(currentIndex);
+      dishNumber.textContent = String(position + 1).padStart(2, "0");
       counter.textContent = `${position + 1} of ${visible.length}`;
       progressFill.style.width = `${((position + 1) / visible.length) * 100}%`;
       calculateTotal();
@@ -814,11 +994,31 @@
 
     function changeSection(section) {
       activeSection = section;
-      sectionButtons.forEach((button) => {
+      document.querySelectorAll(".section-button").forEach((button) => {
         button.setAttribute("aria-selected", String(button.dataset.section === activeSection));
       });
       currentIndex = visibleIndices()[0];
       renderCard();
+    }
+
+    function renderSectionButtons() {
+      const available = new Set(menuItems.map(itemSection));
+      const sectionOrder = ["Featured", "Starters", "Salads", "Gumbo", "Oysters", "Mexicajun", "Tacos", "Fajitas", "Po' Boys", "Po' Boy Combos", "Margaritas"];
+      const sections = sectionOrder.filter((section) => available.has(section));
+      sections.forEach((section) => {
+        const button = document.createElement("button");
+        button.className = "section-button";
+        button.type = "button";
+        button.setAttribute("role", "tab");
+        button.setAttribute("aria-selected", "false");
+        button.dataset.section = section;
+        button.textContent = section;
+        sectionTabs.append(button);
+      });
+      sectionTabs.addEventListener("click", (event) => {
+        const button = event.target.closest(".section-button");
+        if (button) changeSection(button.dataset.section);
+      });
     }
 
     card.addEventListener("click", flipCard);
@@ -831,9 +1031,6 @@
     });
     previousButton.addEventListener("click", () => changeCard(-1));
     nextButton.addEventListener("click", () => changeCard(1));
-    sectionButtons.forEach((button) => {
-      button.addEventListener("click", () => changeSection(button.dataset.section));
-    });
 
     document.addEventListener("keydown", (event) => {
       if (event.target.matches("input")) return;
@@ -857,6 +1054,7 @@
       }
     }, { passive: true });
 
+    renderSectionButtons();
     renderCard();
   </script>
 </body>
