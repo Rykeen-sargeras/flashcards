@@ -48,7 +48,7 @@
       margin: 0 auto;
       padding: max(1rem, env(safe-area-inset-top)) clamp(1rem, 4vw, 2rem) max(1rem, env(safe-area-inset-bottom));
       display: grid;
-      grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+      grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
       gap: clamp(0.7rem, 2vh, 1.1rem);
     }
 
@@ -119,19 +119,17 @@
 
     .section-tabs {
       display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 0.3rem;
-      width: min(100%, 36rem);
+      width: min(100%, 58rem);
       margin: 0 auto;
       padding: 0.28rem;
-      overflow-x: auto;
       border: 1px solid var(--line);
-      border-radius: 999px;
+      border-radius: 1.2rem;
       background: rgba(255, 255, 255, 0.58);
       box-shadow: 0 4px 16px rgba(131, 24, 67, 0.06);
-      scrollbar-width: none;
     }
-
-    .section-tabs::-webkit-scrollbar { display: none; }
 
     .section-button {
       flex: 0 0 auto;
@@ -154,6 +152,75 @@
     }
 
     .section-button:focus-visible { outline: 3px solid rgba(236,72,153,.3); outline-offset: 2px; }
+
+    .study-tools {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.45rem;
+      width: min(100%, 48rem);
+      margin: 0 auto;
+    }
+
+    .tool-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.38rem;
+      min-height: 2.35rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.48rem 0.78rem;
+      background: rgba(255,255,255,.76);
+      color: var(--berry);
+      font-size: 0.74rem;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+    }
+
+    .tool-button:hover { transform: translateY(-1px); }
+    .tool-button:focus-visible { outline: 3px solid rgba(236,72,153,.3); outline-offset: 2px; }
+
+    .shuffle-button {
+      border-color: transparent;
+      background: var(--berry);
+      color: white;
+    }
+
+    .tool-state {
+      padding: 0.12rem 0.38rem;
+      border-radius: 999px;
+      background: #fce7f3;
+      color: var(--magenta);
+      font-size: 0.63rem;
+      text-transform: uppercase;
+    }
+
+    .tool-button[aria-pressed="false"] { color: var(--muted); background: rgba(255,255,255,.42); }
+    .tool-button[aria-pressed="false"] .tool-state { background: #eadde3; color: #765767; }
+
+    .hide-prices .base-price,
+    .hide-prices .price-context,
+    .hide-prices .total-label,
+    .hide-prices .total-price,
+    .hide-prices .addon-price { display: none; }
+    .hide-descriptions .description { display: none; }
+    .hide-sides .side-detail { display: none; }
+    .hide-addons .addons-label,
+    .hide-addons .addons { display: none !important; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
 
     .stage {
       min-height: 0;
@@ -499,6 +566,21 @@
       .total-row { padding-top: 0.5rem; }
     }
 
+    @media (max-width: 640px) {
+      .section-tabs {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        border-radius: 999px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(190,24,93,.35) transparent;
+        scroll-snap-type: x proximity;
+      }
+      .section-button { scroll-snap-align: start; }
+      .study-tools { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; }
+      .study-tools::-webkit-scrollbar { display: none; }
+    }
+
     @media (max-width: 380px) {
       .app { padding-inline: 0.8rem; }
       .card { height: min(64svh, 31rem); }
@@ -526,6 +608,15 @@
 
     <div class="section-tabs" role="tablist" aria-label="Menu sections">
       <button class="section-button" type="button" role="tab" aria-selected="true" data-section="All">All Cards</button>
+    </div>
+
+    <div class="study-tools" aria-label="Study controls">
+      <button class="tool-button shuffle-button" id="shuffleButton" type="button"><span aria-hidden="true">⤨</span> Randomize</button>
+      <button class="tool-button setting-button" type="button" data-setting="prices" aria-pressed="true">Prices <span class="tool-state">On</span></button>
+      <button class="tool-button setting-button" type="button" data-setting="descriptions" aria-pressed="true">Descriptions <span class="tool-state">On</span></button>
+      <button class="tool-button setting-button" type="button" data-setting="sides" aria-pressed="true">Sides <span class="tool-state">On</span></button>
+      <button class="tool-button setting-button" type="button" data-setting="addons" aria-pressed="true">Add-ons <span class="tool-state">On</span></button>
+      <span class="sr-only" id="shuffleStatus" aria-live="polite"></span>
     </div>
 
     <section class="stage" aria-live="polite">
@@ -960,9 +1051,13 @@
     const previousButton = document.getElementById("previousButton");
     const nextButton = document.getElementById("nextButton");
     const sectionTabs = document.querySelector(".section-tabs");
+    const shuffleButton = document.getElementById("shuffleButton");
+    const shuffleStatus = document.getElementById("shuffleStatus");
+    const settingButtons = [...document.querySelectorAll(".setting-button")];
 
     let currentIndex = 0;
     let activeSection = "All";
+    let cardOrder = menuItems.map((_, index) => index);
     let touchStartX = 0;
     let touchStartY = 0;
     let movedBySwipe = false;
@@ -975,10 +1070,7 @@
     }
 
     function visibleIndices() {
-      return menuItems
-        .map((item, index) => ({ item, index }))
-        .filter(({ item }) => activeSection === "All" || itemSection(item) === activeSection)
-        .map(({ index }) => index);
+      return cardOrder.filter((index) => activeSection === "All" || itemSection(menuItems[index]) === activeSection);
     }
 
     function calculateTotal() {
@@ -1123,6 +1215,25 @@
       renderCard();
     }
 
+    function randomizeCards() {
+      for (let index = cardOrder.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [cardOrder[index], cardOrder[randomIndex]] = [cardOrder[randomIndex], cardOrder[index]];
+      }
+      const visible = visibleIndices();
+      currentIndex = visible[0];
+      renderCard();
+      shuffleStatus.textContent = `${visible.length} ${activeSection === "All" ? "cards" : `${activeSection} cards`} randomized.`;
+    }
+
+    function toggleStudySetting(button) {
+      const setting = button.dataset.setting;
+      const isOn = button.getAttribute("aria-pressed") === "true";
+      button.setAttribute("aria-pressed", String(!isOn));
+      button.querySelector(".tool-state").textContent = isOn ? "Off" : "On";
+      document.body.classList.toggle(`hide-${setting}`, isOn);
+    }
+
     function renderSectionButtons() {
       const available = new Set(menuItems.map(itemSection));
       const sectionOrder = ["Starters", "Salads", "Gumbo", "Oysters", "Mexicajun", "Tacos", "Fajitas", "Po' Boys", "Po' Boy Combos", "Seafood Baskets", "Boiled Seafood", "Grilled Plates", "Specialties", "Beverages", "Desserts", "Extras", "Kid's Menu", "Family & Party Packs", "Margaritas"];
@@ -1153,6 +1264,8 @@
     });
     previousButton.addEventListener("click", () => changeCard(-1));
     nextButton.addEventListener("click", () => changeCard(1));
+    shuffleButton.addEventListener("click", randomizeCards);
+    settingButtons.forEach((button) => button.addEventListener("click", () => toggleStudySetting(button)));
 
     document.addEventListener("keydown", (event) => {
       if (event.target.matches("input")) return;
